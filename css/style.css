@@ -1,1247 +1,334 @@
 /* =========================================
-   1. GLOBAL VARIABLES
+   1. WEDDING CONFIGURATION
 ========================================= */
 
-:root {
-    --paper: #fbfbf8;
-    --ink: #333832;
-    --muted: #777d77;
+const CONFIG = {
 
-    --silver: #a7aaa6;
-    --silver2: #d9dcd7;
+    // Wedding date and time
+    // Format: YYYY-MM-DDTHH:MM:SS+02:00
 
-    --green: #506b57;
-    --green-dark: #304a38;
+    weddingDate: "2027-05-08T15:00:00+02:00",
 
-    --line: #d5d8d2;
-    --white: #fff;
+    // WhatsApp number with country code.
+    // Mozambique: 258XXXXXXXXX
+    // No + sign or spaces.
 
-    --serif: "Cormorant Garamond", Georgia, serif;
-    --sans: Montserrat, Arial, sans-serif;
+    whatsappNumber: "258874051610"
 
-    /* Same symbol font stack everywhere so ornaments look identical */
-    --symbols: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", Georgia, serif;
-}
+};
 
 
 /* =========================================
-   2. RESET & GENERAL STYLING
+   2. COUNTDOWN TIMER
 ========================================= */
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+const countdownTarget = new Date(CONFIG.weddingDate).getTime();
 
-html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-}
+function updateCountdown() {
 
-body {
-    margin: 0;
-    background: #eef0ec;
-    color: var(--ink);
-    font-family: var(--serif);
-    -webkit-font-smoothing: antialiased;
-}
+    const now = Date.now();
+    const distance = countdownTarget - now;
 
-/* Page behind the intro must not scroll until the invitation is opened */
-body:not(.invitation-open) {
-    overflow: hidden;
-}
+    const msg = document.getElementById("countMessage");
 
-button,
-input,
-select,
-textarea {
-    font: inherit;
-}
+    if (!Number.isFinite(countdownTarget)) {
 
+        msg.textContent = "A data do evento ainda não foi configurada.";
+        return;
 
-/* =========================================
-   3. MAIN PAGE
-========================================= */
-
-.site-shell {
-    max-width: 1120px;
-    margin: 24px auto;
-    background: var(--paper);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 22px 70px #29362d18;
-
-    /* hidden until the invitation is opened */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 1.2s ease, visibility 1.2s ease;
-}
-
-body.invitation-open .site-shell {
-    opacity: 1;
-    visibility: visible;
-}
-
-.site-shell:before {
-    content: "";
-    position: absolute;
-    top: 13px;
-    right: 13px;
-    bottom: 13px;
-    left: 13px;
-    border: 1px solid #d9dcd6;
-    pointer-events: none;
-    z-index: 5;
-}
-
-.site-shell:after {
-    content: "";
-    position: absolute;
-    top: 19px;
-    right: 19px;
-    bottom: 19px;
-    left: 19px;
-    border: 1px solid #eceee9;
-    pointer-events: none;
-    z-index: 5;
-}
-
-main {
-    position: relative;
-    z-index: 1;
-    max-width: 850px;
-    margin: auto;
-    padding: 78px clamp(24px, 7vw, 88px) 54px;
-}
-
-
-/* =========================================
-   4. BOTANICAL DECORATIONS
-========================================= */
-
-.botanical {
-    position: absolute;
-    z-index: 0;
-    width: clamp(130px, 22vw, 260px);
-    height: auto;
-    opacity: .72;
-    pointer-events: none;
-}
-
-.botanical.top-left {
-    top: 0;
-    left: 0;
-}
-
-.botanical.top-right {
-    top: 80px;
-    right: -35px;
-    -webkit-transform: scaleX(-1) rotate(-8deg);
-    transform: scaleX(-1) rotate(-8deg);
-    opacity: .56;
-}
-
-.botanical.bottom-left {
-    bottom: 180px;
-    left: -38px;
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
-    opacity: .48;
-}
-
-.botanical.bottom-right {
-    bottom: 0;
-    right: 0;
-    -webkit-transform: scaleX(-1) rotate(180deg);
-    transform: scaleX(-1) rotate(180deg);
-    opacity: .65;
-}
-
-
-/* =========================================
-   5. HERO / COUPLE NAMES
-========================================= */
-
-.hero {
-    text-align: center;
-    padding: 24px 0 30px;
-}
-
-.kicker,
-.eyebrow {
-    font: 500 10px var(--sans);
-    letter-spacing: .32em;
-    text-transform: uppercase;
-    color: #7d837d;
-}
-
-.kicker {
-    margin: 0 0 24px;
-}
-
-.rule {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    margin: 20px auto;
-    color: #9ca39b;
-}
-
-.rule:before,
-.rule:after {
-    content: "";
-    width: 76px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #aeb4ac);
-}
-
-.rule:after {
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
-}
-
-.rule span {
-    font-size: 19px;
-}
-
-h1 {
-    font: 400 clamp(54px, 9vw, 94px)/1.08 "Great Vibes", cursive;
-    color: #777e77;
-    margin: 0;
-    text-shadow: 0 1px #fff, 1px 2px #d9dcd7;
-}
-
-.amp {
-    font: italic 30px var(--serif);
-    color: #a3aaa2;
-    display: block;
-    margin: 2px 0;
-}
-
-.hero-copy {
-    font-size: 21px;
-    line-height: 1.45;
-    max-width: 590px;
-    margin: 25px auto 0;
-    color: #50564f;
-}
-
-.hero-copy em {
-    color: var(--green);
-    font-style: italic;
-}
-
-
-/* =========================================
-   6. SECTION HEADINGS
-========================================= */
-
-.section {
-    margin: 42px 0;
-    position: relative;
-}
-
-.section-heading {
-    text-align: center;
-    margin: 0 0 20px;
-}
-
-.section-heading .eyebrow {
-    margin: 0 0 7px;
-}
-
-.section-heading h2 {
-    font: 500 19px var(--serif);
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: #626b62;
-    margin: 0;
-}
-
-.section-heading:after {
-    content: "";
-    display: block;
-    width: 58px;
-    height: 1px;
-    background: #b9c0b7;
-    margin: 13px auto 0;
-}
-
-
-/* =========================================
-   7. CEREMONY CARDS
-========================================= */
-
-.ceremony-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-}
-
-.ceremony {
-    position: relative;
-    text-align: center;
-    padding: 27px 22px 25px;
-    border: 1px solid #cdd2cb;
-    background: rgba(255, 255, 255, .74);
-    min-height: 250px;
-}
-
-.ceremony:before {
-    content: "";
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    bottom: 5px;
-    left: 5px;
-    border: 1px solid #eceee9;
-    pointer-events: none;
-}
-
-.ceremony-index {
-    font: 500 9px var(--sans);
-    letter-spacing: .25em;
-    text-transform: uppercase;
-    color: #889087;
-}
-
-.ceremony-symbol {
-    height: 38px;
-    margin: 12px auto 7px;
-    color: #718273;
-}
-
-.ceremony-symbol svg {
-    height: 100%;
-    width: auto;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.35;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.ceremony h3 {
-    font: 500 25px var(--serif);
-    margin: 5px 0 12px;
-}
-
-.ceremony-date {
-    font-size: 20px;
-    line-height: 1.2;
-    color: #4a514a;
-}
-
-.ceremony-time {
-    font: 500 11px var(--sans);
-    letter-spacing: .12em;
-    color: #737b72;
-    margin-top: 8px;
-    text-transform: uppercase;
-}
-
-.guest-count {
-    font: 500 9px var(--sans);
-    letter-spacing: .09em;
-    color: #7a8279;
-    margin: 11px 0 0;
-}
-
-.ceremony-place {
-    font-size: 17px;
-    font-style: italic;
-    line-height: 1.35;
-    margin: 15px 0 0;
-}
-
-.ceremony-address {
-    font-size: 14px;
-    color: #7b817a;
-    margin: 4px 0 0;
-}
-
-
-/* =========================================
-   8. ADDITIONAL INFORMATION
-========================================= */
-
-.note {
-    max-width: 630px;
-    margin: 0 auto;
-    text-align: center;
-    font-size: 19px;
-    line-height: 1.5;
-    color: #5c635b;
-}
-
-.note .editable {
-    color: #7c847b;
-    font-style: italic;
-}
-
-
-/* =========================================
-   9. COUNTDOWN
-========================================= */
-
-.countdown-wrap {
-    padding: 25px 20px;
-    border-top: 1px solid #d9ddd6;
-    border-bottom: 1px solid #d9ddd6;
-    text-align: center;
-}
-
-.countdown {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 590px;
-    margin: 19px auto 0;
-}
-
-.count-unit {
-    padding: 0 8px;
-    border-right: 1px solid #d4d8d2;
-}
-
-.count-unit:last-child {
-    border: 0;
-}
-
-.count-unit strong {
-    display: block;
-    font: 400 clamp(31px, 5vw, 45px) var(--serif);
-    color: #727a72;
-    font-variant-numeric: tabular-nums;
-}
-
-.count-unit span {
-    font: 500 9px var(--sans);
-    letter-spacing: .17em;
-    text-transform: uppercase;
-    color: #828980;
-}
-
-.count-message {
-    font: italic 15px var(--serif);
-    color: var(--green);
-    margin: 15px 0 0;
-}
-
-
-/* =========================================
-   10. RSVP FORM
-========================================= */
-
-.rsvp-card {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 32px clamp(18px, 4vw, 42px);
-    background: #fff;
-    border: 1px solid #cdd2ca;
-    box-shadow: 0 8px 24px #263b2d0b;
-    text-align: center;
-}
-
-.rsvp-card > p {
-    font-size: 17px;
-    line-height: 1.45;
-    margin: 7px 0 20px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.field {
-    width: 100%;
-    border: 1px solid #d5d9d2;
-    border-radius: 0;
-    background: #fcfcfa;
-    padding: 13px 14px;
-    color: #384139;
-    font: 12px var(--sans);
-    outline: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    transition: border .2s, box-shadow .2s;
-}
-
-select.field {
-    /* keep a visible arrow now that native appearance is reset */
-    background-image:
-        linear-gradient(45deg, transparent 50%, #758c79 50%),
-        linear-gradient(135deg, #758c79 50%, transparent 50%);
-    background-position:
-        calc(100% - 20px) 50%,
-        calc(100% - 15px) 50%;
-    background-size: 5px 5px, 5px 5px;
-    background-repeat: no-repeat;
-    padding-right: 36px;
-}
-
-.field:focus {
-    border-color: #758c79;
-    box-shadow: 0 0 0 3px #718d761c;
-}
-
-textarea.field {
-    grid-column: 1 / -1;
-    min-height: 86px;
-    resize: vertical;
-}
-
-
-/* =========================================
-   11. BUTTONS
-========================================= */
-
-.primary-btn,
-.map-btn {
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
-    display: inline-flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    gap: 10px;
-    background: var(--green-dark);
-    color: white;
-    border: 1px solid var(--green-dark);
-    border-radius: 0;
-    padding: 14px 26px;
-    font: 500 10px var(--sans);
-    letter-spacing: .17em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    touch-action: manipulation;
-    transition: .2s;
-}
-
-.primary-btn {
-    margin-top: 17px;
-    min-width: 230px;
-}
-
-@media (hover: hover) {
-    .primary-btn:hover,
-    .map-btn:hover {
-        background: #49664f;
-        -webkit-transform: translateY(-1px);
-        transform: translateY(-1px);
     }
+
+    if (distance <= 0) {
+
+        ["days", "hours", "minutes", "seconds"].forEach(id => {
+
+            document.getElementById(id).textContent = "00";
+
+        });
+
+        msg.textContent = "Chegou o grande dia. Que seja inesquecível!";
+
+        return;
+
+    }
+
+    const values = {
+
+        days: Math.floor(distance / 86400000),
+
+        hours: Math.floor(distance % 86400000 / 3600000),
+
+        minutes: Math.floor(distance % 3600000 / 60000),
+
+        seconds: Math.floor(distance % 60000 / 1000)
+
+    };
+
+    Object.entries(values).forEach(([id, value]) => {
+
+        document.getElementById(id).textContent =
+            id === "days"
+                ? String(value).padStart(3, "0")
+                : String(value).padStart(2, "0");
+
+    });
+
 }
 
-.microcopy {
-    font: 10px/1.6 var(--sans);
-    color: #8a9088;
-    margin: 13px 0 0;
-}
+// Start countdown
+updateCountdown();
 
-.form-status {
-    display: none;
-    margin: 15px 0 0;
-    padding: 12px;
-    background: #f0f4ef;
-    border-left: 2px solid var(--green);
-    font: 12px/1.5 var(--sans);
-    color: #3d5944;
-    text-align: left;
-}
-
-.form-status.show {
-    display: block;
-}
+// Update every second
+setInterval(updateCountdown, 1000);
 
 
 /* =========================================
-   12. EVENT LOCATION
+   RSVP FORM & WHATSAPP INTEGRATION
 ========================================= */
 
-.location {
-    text-align: center;
-}
+document.addEventListener("DOMContentLoaded", function () {
 
-.location-name {
-    font-size: 23px;
-    margin: 8px 0 4px;
-}
+    const rsvpForm = document.getElementById("rsvpForm");
 
-.location-address {
-    font-size: 16px;
-    color: #737b72;
-    margin: 0 0 17px;
-}
+    if (!rsvpForm) {
+        console.error('Form with id="rsvpForm" not found.');
+        return;
+    }
 
-.map-btn {
-    background: transparent;
-    color: var(--green-dark);
-    border-color: #aeb8ad;
-}
+    rsvpForm.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-@media (hover: hover) {
-    .map-btn:hover {
-        color: white;
-        background: #49664f;
+        const whatsappNumber = "258874051610"; // digits only, no +
+
+        const getValue = (id) => {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error(`Element with id="${id}" not found.`);
+                return "";
+            }
+            return el.value.trim();
+        };
+
+        const guestName  = getValue("guestName");
+        /*const guestCount = getValue("guestCount");*/
+        const attendance = getValue("attendance");
+        const contact    = getValue("contact");
+        const message    = getValue("message");
+        const formStatus = document.getElementById("formStatus");
+
+        const whatsappMessage =
+`CONFIRMAÇÃO DE PRESENÇA — CASAMENTO
+
+Nome: ${guestName}
+Resposta: ${attendance}
+Contacto: ${contact || "Não indicado"}
+Mensagem: ${message || "Sem mensagem adicional"}`;
+
+        const whatsappURL =
+            "https://wa.me/" + whatsappNumber +
+            "?text=" + encodeURIComponent(whatsappMessage);
+
+        window.open(whatsappURL, "_blank");
+
+        if (formStatus) {
+            formStatus.textContent = "A abrir o WhatsApp para enviar a confirmação...";
+        }
+    });
+});
+
+
+/* =========================================
+   4. COPY BANK DETAILS
+========================================= */
+
+document.querySelectorAll("[data-copy]").forEach(button => {
+
+    button.addEventListener("click", async () => {
+
+        const value = button.getAttribute("data-copy");
+
+        try {
+
+            await navigator.clipboard.writeText(value);
+
+            button.textContent = "Copiado";
+
+            setTimeout(() => {
+
+                button.textContent = "Copiar";
+
+            }, 1600);
+
+        } catch (error) {
+
+            button.textContent = "Copie manualmente";
+
+        }
+
+    });
+
+});
+
+
+/* =========================================
+   5. SCROLL ANIMATIONS
+========================================= */
+
+const observer = new IntersectionObserver(entries => {
+
+    entries.forEach(entry => {
+
+        if (entry.isIntersecting) {
+
+            entry.target.classList.add("visible");
+
+            observer.unobserve(entry.target);
+
+        }
+
+    });
+
+}, {
+
+    threshold: 0.08
+
+});
+
+document.querySelectorAll(".reveal").forEach(element => {
+
+    observer.observe(element);
+
+});
+
+
+
+/* =========================================
+   WEDDING INVITATION OPENING & MUSIC
+========================================= */
+
+const invitationIntro = document.getElementById("invitationIntro");
+const openInvitation = document.getElementById("openInvitation");
+
+const weddingMusic = document.getElementById("weddingMusic");
+const musicToggle = document.getElementById("musicToggle");
+const musicIcon = document.getElementById("musicIcon");
+
+
+/* =========================================
+   UPDATE MUSIC BUTTON
+========================================= */
+
+function updateMusicButton() {
+
+    if (!weddingMusic || !musicToggle || !musicIcon) return;
+
+    if (weddingMusic.paused) {
+
+        musicToggle.classList.remove("playing");
+        musicIcon.textContent = "▶";
+        musicToggle.setAttribute("aria-label", "Play music");
+
+    } else {
+
+        musicToggle.classList.add("playing");
+        musicIcon.textContent = "Ⅱ";
+        musicToggle.setAttribute("aria-label", "Pause music");
+
     }
 }
 
 
 /* =========================================
-   13. WEDDING GIFTS / BANK DETAILS
+   OPEN INVITATION & START MUSIC
 ========================================= */
 
-.gift-intro {
-    max-width: 650px;
-    text-align: center;
-    margin: 0 auto 18px;
-    font-size: 18px;
-    line-height: 1.5;
-}
+if (openInvitation && invitationIntro) {
 
-.gift-intro strong {
-    color: var(--green-dark);
-    font-weight: 600;
-}
+    openInvitation.addEventListener("click", async () => {
 
-.bank-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 22px;
-    border-top: 1px solid #d3d7d0;
-    border-bottom: 1px solid #d3d7d0;
-    padding: 13px 18px;
-    background: #f7f8f5;
-}
+        // Animate the envelope
+        openInvitation.classList.add("open");
 
-.bank-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #e4e7e1;
-    font-size: 16px;
-    overflow-wrap: anywhere;
-}
+        // Open the invitation
+        document.body.classList.add("invitation-open");
+        invitationIntro.classList.add("closed");
 
-.bank-item:nth-last-child(-n+2) {
-    border-bottom: 0;
-}
+        // Start music immediately after the click
+        if (weddingMusic) {
 
-.bank-item small {
-    display: block;
-    font: 500 9px var(--sans);
-    letter-spacing: .13em;
-    text-transform: uppercase;
-    color: #828a81;
-    margin-bottom: 4px;
-}
+            weddingMusic.volume = 0.5;
 
-.bank-value {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: space-between;
-}
+            try {
 
-.copy-btn {
-    flex: none;
-    border: 1px solid #d2d8d0;
-    background: white;
-    color: #586d5b;
-    padding: 5px 8px;
-    font: 9px var(--sans);
-    cursor: pointer;
+                await weddingMusic.play();
+
+            } catch (error) {
+
+                console.error("Music playback failed:", error);
+
+            }
+
+        }
+
+        // Update music control
+        updateMusicButton();
+
+        // Return to the top of the invitation
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    });
+
 }
 
 
 /* =========================================
-   14. FOOTER
+   FLOATING MUSIC PLAY / PAUSE BUTTON
 ========================================= */
 
-.footer {
-    text-align: center;
-    margin-top: 45px;
-    color: #788078;
+if (musicToggle && weddingMusic) {
+
+    musicToggle.addEventListener("click", async () => {
+
+        if (weddingMusic.paused) {
+
+            try {
+
+                await weddingMusic.play();
+
+            } catch (error) {
+
+                console.error("Music playback failed:", error);
+
+            }
+
+        } else {
+
+            weddingMusic.pause();
+
+        }
+
+        updateMusicButton();
+
+    });
+
+    // Keep button synchronised with audio
+    weddingMusic.addEventListener("play", updateMusicButton);
+    weddingMusic.addEventListener("pause", updateMusicButton);
+    weddingMusic.addEventListener("ended", updateMusicButton);
+
+    // Report file-loading problems
+    weddingMusic.addEventListener("error", () => {
+
+        console.error(
+            "Unable to load wedding music. Check the MP3 filename and file path."
+        );
+
+    });
+
 }
 
-.footer .mark {
-    font-size: 23px;
-}
-
-.footer p {
-    font: 500 9px var(--sans);
-    letter-spacing: .3em;
-    text-transform: uppercase;
-    margin: 12px 0 0;
-}
-
-
-/* =========================================
-   15. SCROLL ANIMATIONS
-========================================= */
-
-.reveal {
-    opacity: 0;
-    -webkit-transform: translateY(16px);
-    transform: translateY(16px);
-    transition: opacity .7s ease, transform .7s ease;
-}
-
-.reveal.visible {
-    opacity: 1;
-    -webkit-transform: none;
-    transform: none;
-}
-
-
-/* =========================================
-   16. WEDDING LETTER OPENING (INTRO)
-========================================= */
-
-.invitation-intro {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 10000;
-
-    /* fallback first, modern unit last */
-    height: 100vh;
-    height: 100dvh;
-
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-
-    /* Centring is done with auto margins (below) so tall content never clips */
-    -webkit-box-pack: start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-
-    padding: 25px 18px;
-    padding-top: calc(25px + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(25px + env(safe-area-inset-bottom, 0px));
-
-    background: #f8f8f4;
-    background: radial-gradient(ellipse at center, #ffffff 0%, #f8f8f4 72%, #eff1eb 100%);
-
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-
-    transition: opacity 1s ease, visibility 1s ease;
-}
-
-.invitation-intro.closed {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-/* ---------- The invitation letter ---------- */
-
-.letter-card {
-    position: relative;
-    z-index: 1;
-
-    width: 100%;
-    max-width: 490px;
-    min-height: 520px;
-    margin: auto 0 0;
-    padding: 45px 35px 40px;
-
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-
-    text-align: center;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid #d7d9d3;
-    outline: 1px solid rgba(177, 183, 175, 0.5);
-    outline-offset: 7px;
-    box-shadow:
-        0 20px 65px rgba(55, 65, 55, 0.09),
-        0 3px 12px rgba(55, 65, 55, 0.04);
-
-    -webkit-animation: letterAppear 1.4s ease both;
-    animation: letterAppear 1.4s ease both;
-}
-
-@-webkit-keyframes letterAppear {
-    from { opacity: 0; -webkit-transform: translateY(25px); transform: translateY(25px); }
-    to   { opacity: 1; -webkit-transform: translateY(0);    transform: translateY(0); }
-}
-
-@keyframes letterAppear {
-    from { opacity: 0; transform: translateY(25px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Top line sits in normal flow, so the header text can never overlap it */
-.letter-top-line {
-    position: static;
-    -webkit-box-flex: 0;
-    -ms-flex: none;
-    flex: none;
-    width: 100%;
-    max-width: 420px;
-    height: 1px;
-    margin: 0 0 24px;
-    background: #c2c6bf;
-    background: linear-gradient(to right, transparent, #c2c6bf, transparent);
-}
-
-.letter-bottom-line {
-    position: absolute;
-    left: 35px;
-    right: 35px;
-    bottom: 22px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #c2c6bf, transparent);
-}
-
-/* ---------- Text ---------- */
-
-.letter-kicker {
-    -webkit-box-flex: 0;
-    -ms-flex: none;
-    flex: none;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 0 25px;
-    padding: 0 0 0 3px;              /* cancels the trailing letter-spacing so text is truly centred */
-    text-align: center;
-    color: #879486;
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 10px;
-    line-height: 1.8;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    overflow-wrap: break-word;
-}
-
-.letter-ornament {
-    margin: 0 0 20px;
-    color: #aeb6a9;
-    font-size: 25px;
-}
-
-.letter-invitation {
-    max-width: 290px;
-    margin: 0;
-    color: #747a72;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 21px;
-    line-height: 1.5;
-    font-style: italic;
-}
-
-.letter-names {
-    margin: 25px 0 15px;
-    max-width: 100%;
-    color: #687969;
-    font-family: 'Great Vibes', cursive;
-    font-size: clamp(42px, 11vw, 68px);
-    font-weight: 400;
-    line-height: 1.15;
-    text-shadow: none;
-    overflow-wrap: break-word;
-}
-
-.letter-names span {
-    display: block;
-    margin: 7px 0;
-    color: #b9bcb5;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 28px;
-    font-style: italic;
-}
-
-.letter-date {
-    margin: 12px 0 0;
-    color: #858c83;
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 11px;
-    letter-spacing: 4px;
-}
-
-/* the unclassed <p> about the number of guests */
-.letter-card > p:not([class]),
-.letter-note {
-    max-width: 300px;
-    margin: 22px 0 0;
-    color: #7b837a;
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 10px;
-    line-height: 1.7;
-    letter-spacing: 0.5px;
-}
-
-.letter-bottom-ornament {
-    margin: 26px 0 0;
-    color: #aab5a6;
-    font-family: var(--symbols);
-    font-size: 27px;
-    line-height: 1;
-    font-variant-emoji: text;
-}
-
-/* ---------- Opening button ---------- */
-
-.open-invitation-btn {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
-    display: inline-flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    gap: 15px;
-
-    position: relative;
-    z-index: 2;
-    margin: 26px 0 0;
-    padding: 14px 25px;
-    min-height: 48px;
-
-    background: #748575;
-    border: 1px solid #748575;
-    border-radius: 0;
-    color: #fff;
-
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 10px;
-    line-height: 1.2;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    cursor: pointer;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: background-color .35s ease, color .35s ease;
-}
-
-.open-invitation-btn span {
-    display: block;
-}
-
-/* hover only on devices that really hover (no sticky hover on phones) */
-@media (hover: hover) {
-    .open-invitation-btn:hover {
-        background: #fff;
-        color: #748575;
-    }
-}
-
-.open-invitation-btn:focus-visible {
-    outline: 2px solid #748575;
-    outline-offset: 3px;
-}
-
-.open-arrow {
-    font-size: 16px;
-}
-
-/* ---------- Footer text (normal flow, under the button) ---------- */
-
-.letter-footer {
-    position: static;
-    -webkit-transform: none;
-    transform: none;
-    margin: 24px 0 0;
-
-    color: #92998f;
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 8px;
-    line-height: 1.6;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-}
-
-/* ---------- Floral decoration ---------- */
-
-.intro-flower,
-.intro-leaves {
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-    line-height: 1;
-
-    font-family: var(--symbols);
-    font-variant-emoji: text;
-}
-
-.intro-flower {
-    color: #dce2d8;
-    font-size: 170px;
-    opacity: .8;
-}
-
-.intro-flower-left {
-    top: 4%;
-    left: -35px;
-    -webkit-transform: rotate(-25deg);
-    transform: rotate(-25deg);
-}
-
-.intro-flower-right {
-    bottom: 3%;
-    right: -35px;
-    -webkit-transform: rotate(25deg);
-    transform: rotate(25deg);
-}
-
-.intro-leaves {
-    color: #819681;
-    font-size: 180px;
-    opacity: .55;
-}
-
-.intro-leaves-left {
-    bottom: 5%;
-    left: 2%;
-    -webkit-transform: rotate(-35deg);
-    transform: rotate(-35deg);
-}
-
-.intro-leaves-right {
-    top: 4%;
-    right: 2%;
-    -webkit-transform: rotate(35deg);
-    transform: rotate(35deg);
-}
-
-.intro-signature {
-    position: relative;
-    z-index: 1;
-    margin: 35px 0 auto;
-    color: #8b9589;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-style: italic;
-    font-size: 17px;
-    text-align: center;
-}
-
-
-/* =========================================
-   17. MUSIC CONTROL
-========================================= */
-
-.music-toggle {
-    position: fixed;
-    bottom: 25px;
-    bottom: calc(25px + env(safe-area-inset-bottom, 0px));
-    right: 25px;
-    z-index: 9999;
-
-    display: none;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    gap: 9px;
-
-    padding: 12px 18px;
-    border: 1px solid #b9c3bb;
-    border-radius: 40px;
-
-    background: rgba(255, 255, 255, .95);
-    color: #718774;
-
-    font-family: 'Montserrat', Arial, sans-serif;
-    font-size: 11px;
-    letter-spacing: 1px;
-
-    cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
-}
-
-body.invitation-open .music-toggle {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-
-.music-toggle.playing {
-    background: #718774;
-    color: white;
-}
-
-
-/* =========================================
-   18. RESPONSIVE DESIGN / MOBILE
-========================================= */
-
-@media (max-width: 680px) {
-
-    .site-shell {
-        margin: 0;
-    }
-
-    .site-shell:before {
-        top: 8px;
-        right: 8px;
-        bottom: 8px;
-        left: 8px;
-    }
-
-    .site-shell:after {
-        top: 13px;
-        right: 13px;
-        bottom: 13px;
-        left: 13px;
-    }
-
-    main {
-        padding: 55px 24px 38px;
-    }
-
-    .botanical {
-        width: 145px;
-        opacity: .3;
-    }
-
-    .botanical.top-right {
-        right: -45px;
-    }
-
-    .ceremony-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-    }
-
-    .ceremony {
-        min-height: 0;
-        padding: 23px 17px;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    textarea.field {
-        grid-column: auto;
-    }
-
-    .countdown {
-        gap: 0;
-    }
-
-    .count-unit {
-        padding: 0 4px;
-    }
-
-    .count-unit span {
-        font-size: 8px;
-        letter-spacing: .1em;
-    }
-
-    .bank-details {
-        grid-template-columns: 1fr;
-    }
-
-    .bank-item:nth-last-child(2) {
-        border-bottom: 1px solid #e4e7e1;
-    }
-
-    .hero-copy {
-        font-size: 19px;
-    }
-}
-
-@media (max-width: 600px) {
-
-    .letter-card {
-        min-height: 480px;
-        padding: 38px 22px 32px;
-    }
-
-    .intro-flower { font-size: 100px; }
-    .intro-leaves { font-size: 110px; }
-
-    .intro-signature { font-size: 15px; }
-}
-
-/* Short screens (landscape phones, small devices) */
-@media (max-height: 640px) {
-
-    .invitation-intro {
-        padding-top: 16px;
-        padding-bottom: 16px;
-    }
-
-    .letter-card {
-        min-height: 0;
-        padding: 32px 22px 28px;
-    }
-
-    .letter-names {
-        margin: 16px 0 10px;
-    }
-
-    .intro-flower,
-    .intro-leaves {
-        font-size: 90px;
-    }
-}
-
-
-/* =========================================
-   19. ACCESSIBILITY
-========================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    * {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        -webkit-animation: none !important;
-        animation: none !important;
-    }
-
-    .reveal {
-        opacity: 1;
-        -webkit-transform: none;
-        transform: none;
-    }
-}
+// Initial button state
+updateMusicButton();
