@@ -18,6 +18,9 @@
 
     --serif: "Cormorant Garamond", Georgia, serif;
     --sans: Montserrat, Arial, sans-serif;
+
+    /* Same symbol font stack everywhere so ornaments look identical */
+    --symbols: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", Georgia, serif;
 }
 
 
@@ -25,12 +28,16 @@
    2. RESET & GENERAL STYLING
 ========================================= */
 
-* {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
 html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -39,6 +46,11 @@ body {
     color: var(--ink);
     font-family: var(--serif);
     -webkit-font-smoothing: antialiased;
+}
+
+/* Page behind the intro must not scroll until the invitation is opened */
+body:not(.invitation-open) {
+    overflow: hidden;
 }
 
 button,
@@ -60,12 +72,25 @@ textarea {
     position: relative;
     overflow: hidden;
     box-shadow: 0 22px 70px #29362d18;
+
+    /* hidden until the invitation is opened */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.2s ease, visibility 1.2s ease;
+}
+
+body.invitation-open .site-shell {
+    opacity: 1;
+    visibility: visible;
 }
 
 .site-shell:before {
     content: "";
     position: absolute;
-    inset: 13px;
+    top: 13px;
+    right: 13px;
+    bottom: 13px;
+    left: 13px;
     border: 1px solid #d9dcd6;
     pointer-events: none;
     z-index: 5;
@@ -74,7 +99,10 @@ textarea {
 .site-shell:after {
     content: "";
     position: absolute;
-    inset: 19px;
+    top: 19px;
+    right: 19px;
+    bottom: 19px;
+    left: 19px;
     border: 1px solid #eceee9;
     pointer-events: none;
     z-index: 5;
@@ -110,6 +138,7 @@ main {
 .botanical.top-right {
     top: 80px;
     right: -35px;
+    -webkit-transform: scaleX(-1) rotate(-8deg);
     transform: scaleX(-1) rotate(-8deg);
     opacity: .56;
 }
@@ -117,6 +146,7 @@ main {
 .botanical.bottom-left {
     bottom: 180px;
     left: -38px;
+    -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
     opacity: .48;
 }
@@ -124,6 +154,7 @@ main {
 .botanical.bottom-right {
     bottom: 0;
     right: 0;
+    -webkit-transform: scaleX(-1) rotate(180deg);
     transform: scaleX(-1) rotate(180deg);
     opacity: .65;
 }
@@ -168,6 +199,7 @@ main {
 }
 
 .rule:after {
+    -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
 }
 
@@ -261,7 +293,10 @@ h1 {
 .ceremony:before {
     content: "";
     position: absolute;
-    inset: 5px;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+    left: 5px;
     border: 1px solid #eceee9;
     pointer-events: none;
 }
@@ -431,7 +466,23 @@ h1 {
     color: #384139;
     font: 12px var(--sans);
     outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     transition: border .2s, box-shadow .2s;
+}
+
+select.field {
+    /* keep a visible arrow now that native appearance is reset */
+    background-image:
+        linear-gradient(45deg, transparent 50%, #758c79 50%),
+        linear-gradient(135deg, #758c79 50%, transparent 50%);
+    background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 15px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
 }
 
 .field:focus {
@@ -452,19 +503,30 @@ textarea.field {
 
 .primary-btn,
 .map-btn {
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
     display: inline-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     gap: 10px;
     background: var(--green-dark);
     color: white;
     border: 1px solid var(--green-dark);
+    border-radius: 0;
     padding: 14px 26px;
     font: 500 10px var(--sans);
     letter-spacing: .17em;
     text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    touch-action: manipulation;
     transition: .2s;
 }
 
@@ -473,10 +535,13 @@ textarea.field {
     min-width: 230px;
 }
 
-.primary-btn:hover,
-.map-btn:hover {
-    background: #49664f;
-    transform: translateY(-1px);
+@media (hover: hover) {
+    .primary-btn:hover,
+    .map-btn:hover {
+        background: #49664f;
+        -webkit-transform: translateY(-1px);
+        transform: translateY(-1px);
+    }
 }
 
 .microcopy {
@@ -526,8 +591,11 @@ textarea.field {
     border-color: #aeb8ad;
 }
 
-.map-btn:hover {
-    color: white;
+@media (hover: hover) {
+    .map-btn:hover {
+        color: white;
+        background: #49664f;
+    }
 }
 
 
@@ -624,32 +692,425 @@ textarea.field {
 
 .reveal {
     opacity: 0;
+    -webkit-transform: translateY(16px);
     transform: translateY(16px);
     transition: opacity .7s ease, transform .7s ease;
 }
 
 .reveal.visible {
     opacity: 1;
+    -webkit-transform: none;
     transform: none;
 }
 
 
 /* =========================================
-   16. RESPONSIVE DESIGN / MOBILE
+   16. WEDDING LETTER OPENING (INTRO)
 ========================================= */
 
-@media(max-width: 680px) {
+.invitation-intro {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10000;
+
+    /* fallback first, modern unit last */
+    height: 100vh;
+    height: 100dvh;
+
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+
+    /* Centring is done with auto margins (below) so tall content never clips */
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+
+    padding: 25px 18px;
+    padding-top: calc(25px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(25px + env(safe-area-inset-bottom, 0px));
+
+    background: #f8f8f4;
+    background: radial-gradient(ellipse at center, #ffffff 0%, #f8f8f4 72%, #eff1eb 100%);
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
+    transition: opacity 1s ease, visibility 1s ease;
+}
+
+.invitation-intro.closed {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ---------- The invitation letter ---------- */
+
+.letter-card {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    max-width: 490px;
+    min-height: 520px;
+    margin: auto 0 0;
+    padding: 65px 35px 40px;
+
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+
+    text-align: center;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #d7d9d3;
+    outline: 1px solid rgba(177, 183, 175, 0.5);
+    outline-offset: 7px;
+    box-shadow:
+        0 20px 65px rgba(55, 65, 55, 0.09),
+        0 3px 12px rgba(55, 65, 55, 0.04);
+
+    -webkit-animation: letterAppear 1.4s ease both;
+    animation: letterAppear 1.4s ease both;
+}
+
+@-webkit-keyframes letterAppear {
+    from { opacity: 0; -webkit-transform: translateY(25px); transform: translateY(25px); }
+    to   { opacity: 1; -webkit-transform: translateY(0);    transform: translateY(0); }
+}
+
+@keyframes letterAppear {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.letter-top-line,
+.letter-bottom-line {
+    position: absolute;
+    left: 35px;
+    right: 35px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #c2c6bf, transparent);
+}
+
+.letter-top-line    { top: 25px; }
+.letter-bottom-line { bottom: 22px; }
+
+/* ---------- Text ---------- */
+
+.letter-kicker {
+    margin: 0 0 25px;
+    color: #879486;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 10px;
+    line-height: 1.6;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.letter-ornament {
+    margin: 0 0 20px;
+    color: #aeb6a9;
+    font-size: 25px;
+}
+
+.letter-invitation {
+    max-width: 290px;
+    margin: 0;
+    color: #747a72;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 21px;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.letter-names {
+    margin: 25px 0 15px;
+    max-width: 100%;
+    color: #687969;
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(42px, 11vw, 68px);
+    font-weight: 400;
+    line-height: 1.15;
+    text-shadow: none;
+    overflow-wrap: break-word;
+}
+
+.letter-names span {
+    display: block;
+    margin: 7px 0;
+    color: #b9bcb5;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 28px;
+    font-style: italic;
+}
+
+.letter-date {
+    margin: 12px 0 0;
+    color: #858c83;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+}
+
+/* the unclassed <p> about the number of guests */
+.letter-card > p:not([class]),
+.letter-note {
+    max-width: 300px;
+    margin: 22px 0 0;
+    color: #7b837a;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 10px;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+}
+
+.letter-bottom-ornament {
+    margin: 26px 0 0;
+    color: #aab5a6;
+    font-family: var(--symbols);
+    font-size: 27px;
+    line-height: 1;
+    font-variant-emoji: text;
+}
+
+/* ---------- Opening button ---------- */
+
+.open-invitation-btn {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    gap: 15px;
+
+    position: relative;
+    z-index: 2;
+    margin: 26px 0 0;
+    padding: 14px 25px;
+    min-height: 48px;
+
+    background: #748575;
+    border: 1px solid #748575;
+    border-radius: 0;
+    color: #fff;
+
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .35s ease, color .35s ease;
+}
+
+.open-invitation-btn span {
+    display: block;
+}
+
+/* hover only on devices that really hover (no sticky hover on phones) */
+@media (hover: hover) {
+    .open-invitation-btn:hover {
+        background: #fff;
+        color: #748575;
+    }
+}
+
+.open-invitation-btn:focus-visible {
+    outline: 2px solid #748575;
+    outline-offset: 3px;
+}
+
+.open-arrow {
+    font-size: 16px;
+}
+
+/* ---------- Footer text (normal flow, under the button) ---------- */
+
+.letter-footer {
+    position: static;
+    -webkit-transform: none;
+    transform: none;
+    margin: 24px 0 0;
+
+    color: #92998f;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 8px;
+    line-height: 1.6;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* ---------- Floral decoration ---------- */
+
+.intro-flower,
+.intro-leaves {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    line-height: 1;
+
+    font-family: var(--symbols);
+    font-variant-emoji: text;
+}
+
+.intro-flower {
+    color: #dce2d8;
+    font-size: 170px;
+    opacity: .8;
+}
+
+.intro-flower-left {
+    top: 4%;
+    left: -35px;
+    -webkit-transform: rotate(-25deg);
+    transform: rotate(-25deg);
+}
+
+.intro-flower-right {
+    bottom: 3%;
+    right: -35px;
+    -webkit-transform: rotate(25deg);
+    transform: rotate(25deg);
+}
+
+.intro-leaves {
+    color: #819681;
+    font-size: 180px;
+    opacity: .55;
+}
+
+.intro-leaves-left {
+    bottom: 5%;
+    left: 2%;
+    -webkit-transform: rotate(-35deg);
+    transform: rotate(-35deg);
+}
+
+.intro-leaves-right {
+    top: 4%;
+    right: 2%;
+    -webkit-transform: rotate(35deg);
+    transform: rotate(35deg);
+}
+
+.intro-signature {
+    position: relative;
+    z-index: 1;
+    margin: 35px 0 auto;
+    color: #8b9589;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 17px;
+    text-align: center;
+}
+
+
+/* =========================================
+   17. MUSIC CONTROL
+========================================= */
+
+.music-toggle {
+    position: fixed;
+    bottom: 25px;
+    bottom: calc(25px + env(safe-area-inset-bottom, 0px));
+    right: 25px;
+    z-index: 9999;
+
+    display: none;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 9px;
+
+    padding: 12px 18px;
+    border: 1px solid #b9c3bb;
+    border-radius: 40px;
+
+    background: rgba(255, 255, 255, .95);
+    color: #718774;
+
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+}
+
+body.invitation-open .music-toggle {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.music-toggle.playing {
+    background: #718774;
+    color: white;
+}
+
+
+/* =========================================
+   18. RESPONSIVE DESIGN / MOBILE
+========================================= */
+
+@media (max-width: 680px) {
 
     .site-shell {
         margin: 0;
     }
 
     .site-shell:before {
-        inset: 8px;
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
     }
 
     .site-shell:after {
-        inset: 13px;
+        top: 13px;
+        right: 13px;
+        bottom: 13px;
+        left: 13px;
     }
 
     main {
@@ -709,343 +1170,59 @@ textarea.field {
     }
 }
 
+@media (max-width: 600px) {
+
+    .letter-card {
+        min-height: 480px;
+        padding: 55px 22px 32px;
+    }
+
+    .intro-flower { font-size: 100px; }
+    .intro-leaves { font-size: 110px; }
+
+    .intro-signature { font-size: 15px; }
+}
+
+/* Short screens (landscape phones, small devices) */
+@media (max-height: 640px) {
+
+    .invitation-intro {
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+
+    .letter-card {
+        min-height: 0;
+        padding: 48px 22px 28px;
+    }
+
+    .letter-names {
+        margin: 16px 0 10px;
+    }
+
+    .intro-flower,
+    .intro-leaves {
+        font-size: 90px;
+    }
+}
+
 
 /* =========================================
-   17. ACCESSIBILITY
+   19. ACCESSIBILITY
 ========================================= */
 
-@media(prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
 
     * {
         scroll-behavior: auto !important;
         transition: none !important;
+        -webkit-animation: none !important;
+        animation: none !important;
     }
 
     .reveal {
         opacity: 1;
+        -webkit-transform: none;
         transform: none;
-    }
-
-}
-
-
-
-/* =========================================
-   PREMIUM WEDDING LETTER OPENING
-========================================= */
-
-.invitation-intro {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    padding: 25px 18px;
-
-    background:
-        radial-gradient(ellipse at center, #ffffff 0%, #f8f8f4 72%, #eff1eb 100%);
-
-    transition: opacity 1s ease, visibility 1s ease;
-    overflow: hidden;
-}
-
-.invitation-intro.closed {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-/* The invitation letter */
-
-.letter-card {
-    position: relative;
-    width: min(100%, 490px);
-    min-height: 570px;
-
-    padding: 65px 35px 35px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    background: rgba(255,255,255,0.94);
-
-    border: 1px solid #d7d9d3;
-    outline: 1px solid rgba(177,183,175,0.5);
-    outline-offset: 7px;
-
-    box-shadow:
-        0 20px 65px rgba(55,65,55,0.09),
-        0 3px 12px rgba(55,65,55,0.04);
-
-    animation: letterAppear 1.4s ease both;
-}
-
-@keyframes letterAppear {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.letter-top-line,
-.letter-bottom-line {
-    position: absolute;
-    left: 35px;
-    right: 35px;
-    height: 1px;
-    background: linear-gradient(
-        to right,
-        transparent,
-        #c2c6bf,
-        transparent
-    );
-}
-
-.letter-top-line {
-    top: 25px;
-}
-
-.letter-bottom-line {
-    bottom: 22px;
-}
-
-.letter-kicker {
-    color: #879486;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 25px;
-}
-
-.letter-ornament {
-    color: #aeb6a9;
-    font-size: 25px;
-    margin-bottom: 20px;
-}
-
-.letter-invitation {
-    max-width: 290px;
-    color: #747a72;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 21px;
-    line-height: 1.5;
-    font-style: italic;
-}
-
-.letter-names {
-    margin: 25px 0 15px;
-    color: #687969;
-    font-family: 'Great Vibes', cursive;
-    font-size: clamp(48px, 9vw, 68px);
-    font-weight: 400;
-    line-height: 1.15;
-}
-
-.letter-names span {
-    display: block;
-    color: #b9bcb5;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-style: italic;
-    margin: 7px 0;
-}
-
-.letter-date {
-    color: #858c83;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
-    letter-spacing: 4px;
-    margin-top: 12px;
-}
-
-.letter-bottom-ornament {
-    color: #aab5a6;
-    font-size: 27px;
-    margin-top: 28px;
-}
-
-/* Opening button */
-
-.open-invitation-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-
-    margin-top: 2px;
-    padding: 14px 25px;
-
-    background: #748575;
-    border: 1px solid #748575;
-    color: white;
-
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    cursor: pointer;
-    transition: all .35s ease;
-}
-
-.open-invitation-btn:hover {
-    background: white;
-    color: #748575;
-}
-
-.open-arrow {
-    font-size: 16px;
-}
-
-/* Footer */
-
-.letter-footer {
-    position: absolute;
-    bottom: 0;
-    transform: translateY(38px);
-
-    color: #92998f;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 8px;
-    letter-spacing: 3px;
-}
-
-/* Floral decoration */
-
-.intro-flower,
-.intro-leaves {
-    position: absolute;
-    pointer-events: none;
-    user-select: none;
-}
-
-.intro-flower {
-    color: #dce2d8;
-    font-size: 170px;
-    opacity: .8;
-}
-
-.intro-flower-left {
-    top: 4%;
-    left: -35px;
-    transform: rotate(-25deg);
-}
-
-.intro-flower-right {
-    bottom: 3%;
-    right: -35px;
-    transform: rotate(25deg);
-}
-
-.intro-leaves {
-    color: #819681;
-    font-size: 180px;
-    opacity: .55;
-}
-
-.intro-leaves-left {
-    bottom: 5%;
-    left: 2%;
-    transform: rotate(-35deg);
-}
-
-.intro-leaves-right {
-    top: 4%;
-    right: 2%;
-    transform: rotate(35deg);
-}
-
-.intro-signature {
-    color: #8b9589;
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 17px;
-    margin-top: 35px;
-    text-align: center;
-}
-
-/* Main page initially hidden */
-
-.site-shell {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 1.2s ease;
-}
-
-body.invitation-open .site-shell {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Music control */
-
-.music-toggle {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 9999;
-
-    display: none;
-    align-items: center;
-    gap: 9px;
-
-    padding: 12px 18px;
-    border: 1px solid #b9c3bb;
-    border-radius: 40px;
-
-    background: rgba(255,255,255,.95);
-    color: #718774;
-
-    font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
-    letter-spacing: 1px;
-
-    cursor: pointer;
-    box-shadow: 0 4px 18px rgba(0,0,0,.08);
-}
-
-body.invitation-open .music-toggle {
-    display: flex;
-}
-
-.music-toggle.playing {
-    background: #718774;
-    color: white;
-}
-
-@media (max-width: 600px) {
-
-    .letter-card {
-        min-height: 520px;
-        padding: 55px 22px 30px;
-    }
-
-    .intro-flower {
-        font-size: 100px;
-    }
-
-    .intro-leaves {
-        font-size: 110px;
-    }
-
-    .letter-names {
-        font-size: 55px;
-    }
-
-    .intro-signature {
-        font-size: 15px;
     }
 }
