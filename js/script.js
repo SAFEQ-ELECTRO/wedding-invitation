@@ -86,57 +86,56 @@ setInterval(updateCountdown, 1000);
    RSVP FORM & WHATSAPP INTEGRATION
 ========================================= */
 
-const rsvpForm = document.getElementById("rsvpForm");
+document.addEventListener("DOMContentLoaded", function () {
 
-if (rsvpForm) {
+    const rsvpForm = document.getElementById("rsvpForm");
+
+    if (!rsvpForm) {
+        console.error('Form with id="rsvpForm" not found.');
+        return;
+    }
 
     rsvpForm.addEventListener("submit", function (event) {
-
         event.preventDefault();
 
-        // WhatsApp number: country code + number, digits only
-        const whatsappNumber = "+258874051610";
+        const whatsappNumber = "258874051610"; // digits only, no +
 
-        const guestName = document.getElementById("guestName").value.trim();
-        const guestCount = document.getElementById("guestCount").value;
-        const attendance = document.getElementById("attendance").value;
-        const contact = document.getElementById("contact").value.trim();
-        const message = document.getElementById("message").value.trim();
+        const getValue = (id) => {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error(`Element with id="${id}" not found.`);
+                return "";
+            }
+            return el.value.trim();
+        };
 
+        const guestName  = getValue("guestName");
+        const guestCount = getValue("guestCount");
+        const attendance = getValue("attendance");
+        const contact    = getValue("contact");
+        const message    = getValue("message");
         const formStatus = document.getElementById("formStatus");
 
-        // Check WhatsApp number configuration
-        if (!whatsappNumber || whatsappNumber.includes("X")) {
-
-            formStatus.textContent = "WhatsApp number has not been configured.";
-            return;
-
-        }
-
-        // Build WhatsApp message
         const whatsappMessage =
 `CONFIRMAÇÃO DE PRESENÇA — CASAMENTO
 
 Nome: ${guestName}
+Nº de pessoas: ${guestCount || "Não indicado"}
 Resposta: ${attendance}
 Contacto: ${contact || "Não indicado"}
 Mensagem: ${message || "Sem mensagem adicional"}`;
 
-        // Generate WhatsApp URL
         const whatsappURL =
-            "https://wa.me/" +
-            whatsappNumber +
-            "?text=" +
-            encodeURIComponent(whatsappMessage);
+            "https://wa.me/" + whatsappNumber +
+            "?text=" + encodeURIComponent(whatsappMessage);
 
-        // Open WhatsApp
         window.open(whatsappURL, "_blank");
 
-        formStatus.textContent = "A abrir o WhatsApp para enviar a confirmação...";
-
+        if (formStatus) {
+            formStatus.textContent = "A abrir o WhatsApp para enviar a confirmação...";
+        }
     });
-
-}
+});
 
 
 /* =========================================
