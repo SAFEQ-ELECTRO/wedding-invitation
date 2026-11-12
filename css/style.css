@@ -767,7 +767,7 @@ textarea.field {
     max-width: 490px;
     min-height: 520px;
     margin: auto 0 0;
-    padding: 65px 35px 40px;
+    padding: 45px 35px 40px;
 
     display: -webkit-box;
     display: -ms-flexbox;
@@ -806,28 +806,47 @@ textarea.field {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-.letter-top-line,
+/* Top line sits in normal flow, so the header text can never overlap it */
+.letter-top-line {
+    position: static;
+    -webkit-box-flex: 0;
+    -ms-flex: none;
+    flex: none;
+    width: 100%;
+    max-width: 420px;
+    height: 1px;
+    margin: 0 0 24px;
+    background: #c2c6bf;
+    background: linear-gradient(to right, transparent, #c2c6bf, transparent);
+}
+
 .letter-bottom-line {
     position: absolute;
     left: 35px;
     right: 35px;
+    bottom: 22px;
     height: 1px;
     background: linear-gradient(to right, transparent, #c2c6bf, transparent);
 }
 
-.letter-top-line    { top: 25px; }
-.letter-bottom-line { bottom: 22px; }
-
 /* ---------- Text ---------- */
 
 .letter-kicker {
+    -webkit-box-flex: 0;
+    -ms-flex: none;
+    flex: none;
+    width: 100%;
+    max-width: 100%;
     margin: 0 0 25px;
+    padding: 0 0 0 3px;              /* cancels the trailing letter-spacing so text is truly centred */
+    text-align: center;
     color: #879486;
     font-family: 'Montserrat', Arial, sans-serif;
     font-size: 10px;
-    line-height: 1.6;
+    line-height: 1.8;
     letter-spacing: 3px;
     text-transform: uppercase;
+    overflow-wrap: break-word;
 }
 
 .letter-ornament {
@@ -1174,7 +1193,7 @@ body.invitation-open .music-toggle {
 
     .letter-card {
         min-height: 480px;
-        padding: 55px 22px 32px;
+        padding: 38px 22px 32px;
     }
 
     .intro-flower { font-size: 100px; }
@@ -1193,7 +1212,7 @@ body.invitation-open .music-toggle {
 
     .letter-card {
         min-height: 0;
-        padding: 48px 22px 28px;
+        padding: 32px 22px 28px;
     }
 
     .letter-names {
